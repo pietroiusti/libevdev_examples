@@ -29,7 +29,7 @@
 extern "C" {
 #endif
 
-#include <libevdev/libevdev.h>
+#include "./libevdev.h"
 
 struct libevdev_uinput;
 

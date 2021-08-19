@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 /*
+ * Copyright © 2013 Red Hat, Inc.
+ */
+
+/*
  * send a key press of KEY_UP for each key pressed
  */
 
@@ -173,7 +177,7 @@ main(int argc, char **argv)
 	    printf("uifd < 0\n");
 	    return -errno;
 	}
-
+    
 	err = libevdev_uinput_create_from_device(dev, uifd, &uidev);
 	if (err != 0)
 	    return err;
@@ -197,8 +201,15 @@ main(int argc, char **argv)
 			printf("::::::::::::::::::::: re-synced ::::::::::::::::::::::\n");
 		} else if (rc == LIBEVDEV_READ_STATUS_SUCCESS) {
 			print_event(&ev);
-			libevdev_uinput_write_event(uidev, EV_KEY, KEY_UP, 1);
-			libevdev_uinput_write_event(uidev, EV_KEY, KEY_UP, 0);
+			err = libevdev_uinput_write_event(uidev, EV_KEY, KEY_A, 1);
+			if (err != 0)
+			    return err; //use perror?
+			err = libevdev_uinput_write_event(uidev, EV_KEY, KEY_A, 0);
+			if (err != 0)
+			    return err;
+			err = libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
+			if (err != 0)
+			    return err;
 		}
 	} while (rc == LIBEVDEV_READ_STATUS_SYNC || rc == LIBEVDEV_READ_STATUS_SUCCESS || rc == -EAGAIN);
 

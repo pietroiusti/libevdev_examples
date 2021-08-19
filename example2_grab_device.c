@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: MIT
 /*
+ * Copyright © 2013 Red Hat, Inc.
+ */
+
+/*
  *  grab device and print events.
  */
 
