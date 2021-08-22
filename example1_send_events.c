@@ -4,7 +4,7 @@
  */
 
 /*
- * send a key press of KEY_UP for each key pressed
+ * send a key press of `key_to_send` for each key pressed
  */
 
 #include "./libevdev-1.11.0/config.h"
@@ -21,6 +21,10 @@
 #include "./libevdev-1.11.0/libevdev/libevdev.h"
 
 #include "./libevdev-1.11.0/libevdev/libevdev-uinput.h"
+
+
+unsigned int key_to_send = KEY_A;
+
 
 static void
 print_abs_bits(struct libevdev *dev, int axis)
@@ -201,10 +205,17 @@ main(int argc, char **argv)
 			printf("::::::::::::::::::::: re-synced ::::::::::::::::::::::\n");
 		} else if (rc == LIBEVDEV_READ_STATUS_SUCCESS) {
 			print_event(&ev);
-			err = libevdev_uinput_write_event(uidev, EV_KEY, KEY_A, 1);
+
+
+
+			err = libevdev_uinput_write_event(uidev, EV_KEY, key_to_send, 1);
 			if (err != 0)
 			    return err; //use perror?
-			err = libevdev_uinput_write_event(uidev, EV_KEY, KEY_A, 0);
+			err = libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
+			if (err != 0)
+			    return err;
+
+			err = libevdev_uinput_write_event(uidev, EV_KEY, key_to_send, 0);
 			if (err != 0)
 			    return err;
 			err = libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0);
