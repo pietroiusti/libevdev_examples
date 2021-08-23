@@ -7,7 +7,7 @@
  *  grab device and print events.
  */
 
-#include "./libevdev-1.11.0/config.h"
+// #include "config.h"
 
 #include <assert.h>
 #include <errno.h>
@@ -18,9 +18,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "./libevdev-1.11.0/libevdev/libevdev.h"
+#include "libevdev/libevdev.h"
 
-#include "./libevdev-1.11.0/libevdev/libevdev-uinput.h"
+#include "libevdev/libevdev-uinput.h"
 
 #include <unistd.h>
 
