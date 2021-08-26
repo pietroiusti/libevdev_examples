@@ -4,7 +4,7 @@
  */
 
 /*
- *  grab device and print events.
+ *  Grab device and send only EV_KEY and EV_SYN intercepted events.
  */
 
 // #include "config.h"
@@ -137,6 +137,8 @@ main(int argc, char **argv)
 	if (argc < 2)
 		goto out;
 
+	sleep(1); // avoid intercepting KEY_ENTER UP event
+
 	file = argv[1];
 	fd = open(file, O_RDONLY);
 	if (fd < 0) {
@@ -149,24 +151,6 @@ main(int argc, char **argv)
 		fprintf(stderr, "Failed to init libevdev (%s)\n", strerror(-rc));
 		goto out;
 	}
-
-	/*
-	printf("Input device ID: bus %#x vendor %#x product %#x\n",
-			libevdev_get_id_bustype(dev),
-			libevdev_get_id_vendor(dev),
-			libevdev_get_id_product(dev));
-	printf("Evdev version: %x\n", libevdev_get_driver_version(dev));
-	printf("Input device name: \"%s\"\n", libevdev_get_name(dev));
-	printf("Phys location: %s\n", libevdev_get_phys(dev));
-	printf("Uniq identifier: %s\n", libevdev_get_uniq(dev));
-	print_bits(dev);
-	print_props(dev);
-	*/
-
-
-
-
-
 
 	// see
 	// https://www.freedesktop.org/software/libevdev/doc/latest/group__uinput.html#details
@@ -184,47 +168,11 @@ main(int argc, char **argv)
 	if (err != 0)
 	    return err;
 
-
-	
-
-	/* I've tried to disable the default key function with the
-	 * following but it doesn't work. */
-
-	/* int disable; */
-	/* disable = libevdev_disable_event_type(dev, EV_KEY); */
-	/* if (disable < 0) { */
-	/*     printf("disable < 0\n"); */
-	/*     return -errno; */
-	/* } */
-
-	/* disable = libevdev_disable_event_type(dev, EV_MSC); */
-	/* if (disable < 0) { */
-	/*     printf("disable < 0\n"); */
-	/*     return -errno; */
-	/* } */
-
-
-
-
-
-	/* Given that the above didn't work I'm gonna try now to
-	 * `grab` the device. The documentation says that it's
-	 * generally a bad idea. I think thought that our case might
-	 * be one of the few in which grab is the right thing to do */
-	sleep(1);
 	int grab = libevdev_grab(dev, LIBEVDEV_GRAB);
 	if (grab < 0) {
 	    printf("grab < 0\n");
 	    return -errno;
 	}
-
-
-
-
-
-
-
-
 
 	do {
 		struct input_event ev;
@@ -237,11 +185,14 @@ main(int argc, char **argv)
 			}
 			printf("::::::::::::::::::::: re-synced ::::::::::::::::::::::\n");
 		} else if (rc == LIBEVDEV_READ_STATUS_SUCCESS) {
-		    		   
+
+
+
+		    print_event(&ev);
+
 		    // write only events of type EV_KEY or EV_SYN
-		    if ( (strcmp("EV_KEY", libevdev_event_type_get_name(ev.type)) == 0)
-			 ||
-			 (strcmp("EV_SYN", libevdev_event_type_get_name(ev.type)) == 0) ) {
+
+		    if (ev.type == EV_KEY || ev.type == EV_SYN) {
 			err = libevdev_uinput_write_event(uidev, ev.type, ev.code, ev.value);
 			if (err != 0)
 			    return err; //use perror?
@@ -249,19 +200,9 @@ main(int argc, char **argv)
 			if (err != 0)
 			    return err;
 		    }
-		    
-
-		    /* err = libevdev_uinput_write_event(uidev, ev.type, ev.code, ev.value); */
-		    /* if (err != 0) */
-		    /* 	return err; //use perror? */
-		    /* err = libevdev_uinput_write_event(uidev, EV_SYN, SYN_REPORT, 0); */
-		    /* if (err != 0) */
-		    /* 	return err; */
-		    
-		    
 
 
-		    
+
 		}
 	} while (rc == LIBEVDEV_READ_STATUS_SYNC || rc == LIBEVDEV_READ_STATUS_SUCCESS || rc == -EAGAIN);
 
