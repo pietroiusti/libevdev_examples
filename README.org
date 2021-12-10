@@ -1,3 +1,5 @@
+Examples based on libevdev's docs.
+
 The examples require libevdev installed.
 
 Compile with
