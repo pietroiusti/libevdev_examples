@@ -4,5 +4,5 @@ The examples require libevdev installed.
 
 Compile with
 #+begin_src
-gcc `pkg-config --cflags libevdev` `pkg-config --libs libevdev` example_name.c
+gcc `pkg-config --cflags libevdev` example_name.c `pkg-config --libs libevdev` -o example_name
 #+end_src
